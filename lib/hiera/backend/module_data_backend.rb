@@ -24,8 +24,9 @@ class Hiera
         if File.exist?(module_config)
           Hiera.debug("Reading config from %s file" % module_config)
           config = load_data(module_config)
+          Hiera::Config.load(config)
         end
-      
+
         config["path"] = path
 
         default_config.merge(config)
@@ -76,6 +77,7 @@ class Hiera
           next if data.empty?
           next unless data.include?(key)
 
+          Hiera.debug("Found #{key} in #{source}")
           new_answer = Backend.parse_answer(data[key], scope)
           case resolution_type
             when :array
@@ -93,6 +95,7 @@ class Hiera
           end
         end
 
+        Hiera::Config.load(Puppet.settings[:hiera_config])
         return answer
       end
     end
